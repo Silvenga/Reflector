@@ -8,7 +8,7 @@ namespace Reflector.Contracts
     {
         public string Name { get; set; }
 
-        public BindingFlags BindingFlags { get; set; }
+        public BindingFlags BindingFlags { get; set; } = BindingFlags.Instance | BindingFlags.Public;
 
         public FieldBindingAttribute(string name)
         {

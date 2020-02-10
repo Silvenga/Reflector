@@ -25,6 +25,7 @@ namespace Reflector.Tests.Core
             Assert.Equal(instance.Property, propertyValue);
         }
 
+        [ExpectType("Reflector.Tests.Fixtures." + nameof(Example))]
         public interface IExampleAccessorFixture : ITypedReflectAccessor
         {
             [FieldBinding("Field")]

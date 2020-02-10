@@ -3,14 +3,14 @@ using System.Reflection;
 
 namespace Reflector.Contracts
 {
-    [AttributeUsage(AttributeTargets.Property)]
-    public class PropertyBindingAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Method)]
+    public class MethodBindingAttribute : Attribute
     {
         public string Name { get; set; }
 
         public BindingFlags BindingFlags { get; set; } = BindingFlags.Instance | BindingFlags.Public;
 
-        public PropertyBindingAttribute(string name)
+        public MethodBindingAttribute(string name)
         {
             Name = name;
         }
