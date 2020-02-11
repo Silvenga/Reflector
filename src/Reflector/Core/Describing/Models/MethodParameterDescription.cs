@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Reflector.Core.Describing
+namespace Reflector.Core.Describing.Models
 {
     public class MethodParameterDescription
     {

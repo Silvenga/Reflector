@@ -2,11 +2,13 @@
 
 namespace Reflector
 {
-    public class Reflect
+    public static class Reflect
     {
-        public static IReflectBuilder<T> On<T>(T instance)
+        private static readonly IReflectBuilder Builder = new ReflectBuilder();
+
+        public static T On<T>(object instance) where T : class, ITypedReflectAccessor
         {
-            return new ReflectBuilder<T>(instance);
+            return Builder.Bind<T>(instance);
         }
     }
 }

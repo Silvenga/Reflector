@@ -1,4 +1,4 @@
-﻿namespace Reflector.Core.Describing
+﻿namespace Reflector.Core.Describing.Models
 {
     public class MemberDescription
     {

@@ -14,22 +14,22 @@ namespace Reflector.Tests.Core
         public void METHOD_NAME()
         {
             var instance = AutoFixture.Create<Example>();
-            var builder = new ReflectBuilder<object>(instance);
+            var builder = new ReflectBuilder();
 
             // Act
-            var accessor = builder.Bind<IExampleAccessorFixture>();
+            var accessor = builder.Bind<IExampleAccessorFixture>(instance);
 
-            var propertyValue = accessor.Property;
+            //var propertyValue = accessor.Property;
 
             // Assert
-            Assert.Equal(instance.Property, propertyValue);
+            //Assert.Equal(instance.Property, propertyValue);
         }
 
         [ExpectType("Reflector.Tests.Fixtures." + nameof(Example))]
         public interface IExampleAccessorFixture : ITypedReflectAccessor
         {
-            [FieldBinding("Field")]
-            string Field { get; set; }
+            //[FieldBinding("Field")]
+            //string Field { get; set; }
 
             [PropertyBinding("Property")]
             string Property { get; set; }

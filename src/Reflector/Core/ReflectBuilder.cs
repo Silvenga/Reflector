@@ -1,19 +1,19 @@
-﻿using System;
+﻿using Reflector.Core.Describing;
+using Reflector.Core.Implementing;
 
 namespace Reflector.Core
 {
-    public class ReflectBuilder<T> : IReflectBuilder<T>
+    public class ReflectBuilder : IReflectBuilder
     {
-        private readonly T _instance;
+        private readonly DescriptionBuilder _descriptionBuilder = new DescriptionBuilder();
+        private readonly ImplementationBuilder _implementationBuilder = new ImplementationBuilder();
 
-        public ReflectBuilder(T instance)
+        public TAccessor Bind<TAccessor>(object instance) where TAccessor : ITypedReflectAccessor
         {
-            _instance = instance;
-        }
+            var description = _descriptionBuilder.Describe<TAccessor>();
+            var implementation = _implementationBuilder.Implement<TAccessor>(instance, new Dispatcher(), description);
 
-        public TAccessor Bind<TAccessor>() where TAccessor : class, ITypedReflectAccessor
-        {
-            throw new NotImplementedException();
+            return implementation;
         }
     }
 }

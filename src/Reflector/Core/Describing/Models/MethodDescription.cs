@@ -2,7 +2,7 @@
 using System.Reflection;
 using Reflector.Contracts;
 
-namespace Reflector.Core.Describing
+namespace Reflector.Core.Describing.Models
 {
     public delegate MethodInfo MethodInfoFactory(Type targetType);
 
