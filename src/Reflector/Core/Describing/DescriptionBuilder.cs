@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Reflector.Contracts;
 using Reflector.Core.Describing.Models;
 
@@ -12,72 +13,94 @@ namespace Reflector.Core.Describing
         // - Ignore IsSpecialName?
         // - Handle inheritance.
 
+        private int _lastId;
+
         public AccessorDescription Describe<TAccessor>() where TAccessor : ITypedReflectAccessor
         {
             var accessorType = typeof(TAccessor);
+            var dispatcherProperty = typeof(ITypedReflectAccessor).GetProperty(nameof(ITypedReflectAccessor.Dispatcher))
+                                     ?? throw new ArgumentException("Dispatcher property is missing on ITypedReflectAccessor");
+            var instanceProperty = typeof(ITypedReflectAccessor).GetProperty(nameof(ITypedReflectAccessor.Instance))
+                                   ?? throw new ArgumentException("Instance property is missing on ITypedReflectAccessor");
+            var accessorDescription = new AccessorDescription(
+                accessorType,
+                dispatcherProperty,
+                instanceProperty
+            );
 
-            var accessorDescription = new AccessorDescription
+            var members = new Dictionary<int, MemberDescription>();
+
+            var fields = BuildFields(accessorType);
+            foreach (var field in fields)
             {
-                AccessorType = accessorType,
-                DispatcherProperty = typeof(ITypedReflectAccessor).GetProperty(nameof(ITypedReflectAccessor.Dispatcher)),
-                InstanceProperty = typeof(ITypedReflectAccessor).GetProperty(nameof(ITypedReflectAccessor.Instance))
-            };
+                members.Add(field.Id, field);
+            }
 
-            // Casting for net35, because reasons... 
-            var fields = BuildFields(accessorType).Cast<MemberDescription>();
-            var properties = BuildProperties(accessorType).Cast<MemberDescription>();
+            var properties = BuildProperties(accessorType);
+            foreach (var property in properties)
+            {
+                members.Add(property.Id, property);
+            }
 
-            var members = new List<MemberDescription>();
-            members.AddRange(fields);
-            members.AddRange(properties);
+            var methods = BuildMethods(accessorType);
+            foreach (var method in methods)
+            {
+                members.Add(method.Id, method);
+            }
 
             accessorDescription.Members = members;
 
             return accessorDescription;
         }
 
-        private static IEnumerable<FieldDescription> BuildFields(Type accessorType)
+        private IEnumerable<FieldDescription> BuildFields(Type accessorType)
         {
             return from propertyInfo in accessorType.GetProperties()
                    from attribute in propertyInfo.GetCustomAttributes(true)
                    let bindingAttribute = attribute as FieldBindingAttribute
                    where bindingAttribute != null
-                   select new FieldDescription
-                   {
-                       SourceProperty = propertyInfo,
-                       BindingAttribute = bindingAttribute,
-                       FieldInfoFactory = targetType => targetType.GetField(bindingAttribute.Name, bindingAttribute.BindingFlags),
-                       MemberName = bindingAttribute.Name
-                   };
+                   select new FieldDescription(
+                       NextId(),
+                       bindingAttribute.Name,
+                       propertyInfo,
+                       bindingAttribute,
+                       targetType => targetType.GetField(bindingAttribute.Name, bindingAttribute.BindingFlags)
+                   );
         }
 
-        private static IEnumerable<PropertyDescription> BuildProperties(Type accessorType)
+        private IEnumerable<PropertyDescription> BuildProperties(Type accessorType)
         {
             return from propertyInfo in accessorType.GetProperties()
                    from attribute in propertyInfo.GetCustomAttributes(true)
                    let bindingAttribute = attribute as PropertyBindingAttribute
                    where bindingAttribute != null
-                   select new PropertyDescription
-                   {
-                       SourceProperty = propertyInfo,
-                       BindingAttribute = bindingAttribute,
-                       PropertyInfoFactory = targetType => targetType.GetProperty(bindingAttribute.Name, bindingAttribute.BindingFlags),
-                       MemberName = bindingAttribute.Name
-                   };
+                   select new PropertyDescription(
+                       NextId(),
+                       bindingAttribute.Name,
+                       propertyInfo,
+                       bindingAttribute,
+                       targetType => targetType.GetProperty(bindingAttribute.Name, bindingAttribute.BindingFlags)
+                   );
         }
 
-        //private IEnumerable<MethodDescription> BuildMethods(Type accessorType)
-        //{
-        //    return from methodInfo in accessorType.GetMethods()
-        //           from attribute in methodInfo.GetCustomAttributes(true)
-        //           let methodBindingAttribute = attribute as MethodBindingAttribute
-        //           where methodBindingAttribute != null
-        //           select new MethodDescription
-        //           {
-        //               BindingAttribute = methodBindingAttribute,
-        //               MethodInfoFactory = targetType => targetType.GetMethod(methodBindingAttribute.Name, methodBindingAttribute.BindingFlags),
-        //               MemberName = methodBindingAttribute.Name
-        //           };
-        //}
+        private IEnumerable<MethodDescription> BuildMethods(Type accessorType)
+        {
+            return from methodInfo in accessorType.GetMethods()
+                   from attribute in methodInfo.GetCustomAttributes(true)
+                   let bindingAttribute = attribute as MethodBindingAttribute
+                   where bindingAttribute != null
+                   select new MethodDescription(
+                       NextId(),
+                       bindingAttribute.Name,
+                       bindingAttribute,
+                       methodInfo,
+                       targetType => targetType.GetMethod(bindingAttribute.Name, bindingAttribute.BindingFlags)
+                   );
+        }
+
+        private int NextId()
+        {
+            return Interlocked.Increment(ref _lastId);
+        }
     }
 }

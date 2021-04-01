@@ -8,8 +8,17 @@ namespace Reflector.Core.Describing.Models
 
     public class MethodDescription : MemberDescription
     {
-        public MethodBindingAttribute BindingAttribute { get; set; }
+        public MethodBindingAttribute BindingAttribute { get; }
 
-        public MethodInfoFactory MethodInfoFactory { get; set; }
+        public MethodInfo SourceMethod { get; set; }
+
+        public MethodInfoFactory MethodInfoFactory { get; }
+
+        public MethodDescription(int id, string memberName, MethodBindingAttribute bindingAttribute, MethodInfo sourceMethod, MethodInfoFactory methodInfoFactory) : base(id, memberName)
+        {
+            BindingAttribute = bindingAttribute;
+            SourceMethod = sourceMethod;
+            MethodInfoFactory = methodInfoFactory;
+        }
     }
 }

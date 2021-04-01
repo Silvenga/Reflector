@@ -11,7 +11,7 @@ namespace Reflector.Core
         public TAccessor Bind<TAccessor>(object instance) where TAccessor : ITypedReflectAccessor
         {
             var description = _descriptionBuilder.Describe<TAccessor>();
-            var implementation = _implementationBuilder.Implement<TAccessor>(instance, new Dispatcher(), description);
+            var implementation = _implementationBuilder.Implement<TAccessor>(instance, new Dispatcher(description), description);
 
             return implementation;
         }

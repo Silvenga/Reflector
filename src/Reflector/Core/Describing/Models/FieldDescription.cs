@@ -8,10 +8,18 @@ namespace Reflector.Core.Describing.Models
 
     public class FieldDescription : MemberDescription
     {
-        public PropertyInfo SourceProperty { get; set; }
+        public PropertyInfo SourceProperty { get; }
 
-        public FieldBindingAttribute BindingAttribute { get; set; }
+        public FieldBindingAttribute BindingAttribute { get; }
 
-        public FieldInfoFactory FieldInfoFactory { get; set; }
+        public FieldInfoFactory FieldInfoFactory { get; }
+
+        public FieldDescription(int id, string memberName, PropertyInfo sourceProperty, FieldBindingAttribute bindingAttribute,
+                                FieldInfoFactory fieldInfoFactory) : base(id, memberName)
+        {
+            SourceProperty = sourceProperty;
+            BindingAttribute = bindingAttribute;
+            FieldInfoFactory = fieldInfoFactory;
+        }
     }
 }

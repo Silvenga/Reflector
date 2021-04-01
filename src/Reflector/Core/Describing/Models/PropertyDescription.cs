@@ -8,10 +8,18 @@ namespace Reflector.Core.Describing.Models
 
     public class PropertyDescription : MemberDescription
     {
-        public PropertyInfo SourceProperty { get; set; }
+        public PropertyInfo SourceProperty { get; }
 
-        public PropertyBindingAttribute BindingAttribute { get; set; }
+        public PropertyBindingAttribute BindingAttribute { get; }
 
-        public PropertyInfoFactory PropertyInfoFactory { get; set; }
+        public PropertyInfoFactory PropertyInfoFactory { get; }
+
+        public PropertyDescription(int id, string memberName, PropertyInfo sourceProperty, PropertyBindingAttribute bindingAttribute,
+                                   PropertyInfoFactory propertyInfoFactory) : base(id, memberName)
+        {
+            SourceProperty = sourceProperty;
+            BindingAttribute = bindingAttribute;
+            PropertyInfoFactory = propertyInfoFactory;
+        }
     }
 }

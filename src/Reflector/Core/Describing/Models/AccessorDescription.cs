@@ -12,8 +12,15 @@ namespace Reflector.Core.Describing.Models
 
         public PropertyInfo InstanceProperty { get; set; }
 
-        public ICollection<MemberDescription> Members { get; set; }
+        public IReadOnlyDictionary<int, MemberDescription> Members { get; set; } = new Dictionary<int, MemberDescription>();
 
-        public ICollection<AccessorExpectation> Expectations { get; set; }
+        public IReadOnlyList<AccessorExpectation> Expectations { get; set; } = new List<AccessorExpectation>();
+
+        public AccessorDescription(Type accessorType, PropertyInfo dispatcherProperty, PropertyInfo instanceProperty)
+        {
+            AccessorType = accessorType;
+            DispatcherProperty = dispatcherProperty;
+            InstanceProperty = instanceProperty;
+        }
     }
 }

@@ -18,8 +18,8 @@ namespace Reflector.Tests.Core.Describing
             var description = builder.Describe<IExampleAccessorFixture>();
 
             // Assert
-            description.Members.Should().ContainSingle(x => x.MemberName == "Field")
-                       .Which.Should().BeAssignableTo<FieldDescription>();
+            description.Members.Should().ContainSingle(x => x.Value.MemberName == "Field")
+                       .Which.Value.Should().BeAssignableTo<FieldDescription>();
         }
 
         [Fact]
@@ -31,8 +31,47 @@ namespace Reflector.Tests.Core.Describing
             var description = builder.Describe<IExampleAccessorFixture>();
 
             // Assert
-            description.Members.Should().ContainSingle(x => x.MemberName == "Property")
-                       .Which.Should().BeAssignableTo<PropertyDescription>();
+            description.Members.Should().ContainSingle(x => x.Value.MemberName == "Property")
+                       .Which.Value.Should().BeAssignableTo<PropertyDescription>();
+        }
+
+        [Fact]
+        public void When_describing_void_methods_then_method_description_should_be_produced()
+        {
+            var builder  = new DescriptionBuilder();
+
+            // Act
+            var description = builder.Describe<IExampleAccessorFixture>();
+
+            // Assert
+            description.Members.Should().ContainSingle(x => x.Value.MemberName == "VoidMethod")
+                       .Which.Value.Should().BeAssignableTo<MethodDescription>();
+        }
+
+        [Fact]
+        public void When_describing_methods_with_returns_then_method_description_should_be_produced()
+        {
+            var builder  = new DescriptionBuilder();
+
+            // Act
+            var description = builder.Describe<IExampleAccessorFixture>();
+
+            // Assert
+            description.Members.Should().ContainSingle(x => x.Value.MemberName == "MethodWithReturn")
+                       .Which.Value.Should().BeAssignableTo<MethodDescription>();
+        }
+
+        [Fact]
+        public void When_describing_methods_with_arguments_then_method_description_should_be_produced()
+        {
+            var builder  = new DescriptionBuilder();
+
+            // Act
+            var description = builder.Describe<IExampleAccessorFixture>();
+
+            // Assert
+            description.Members.Should().ContainSingle(x => x.Value.MemberName == "MethodWithArguments")
+                       .Which.Value.Should().BeAssignableTo<MethodDescription>();
         }
 
         [Fact]
@@ -68,6 +107,15 @@ namespace Reflector.Tests.Core.Describing
 
             [PropertyBinding("Property")]
             string Property { get; set; }
+
+            [MethodBinding("VoidMethod")]
+            void VoidMethod();
+
+            [MethodBinding("MethodWithReturn")]
+            object MethodWithReturn();
+
+            [MethodBinding("MethodWithArguments")]
+            void MethodWithArguments(object obj1, object obj2);
 
             string NoBinding { get; set; }
         }

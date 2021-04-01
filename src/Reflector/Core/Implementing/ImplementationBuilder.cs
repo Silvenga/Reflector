@@ -57,6 +57,24 @@ namespace Reflector.Core.Implementing
             AddFieldAccessor(description.DispatcherProperty, typeBuilder, dispatchFieldBuilder);
             AddFieldAccessor(description.InstanceProperty, typeBuilder, instanceFieldBuilder);
 
+            foreach (var member in description.Members)
+            {
+                var id = member.Key;
+                var memberDescription = member.Value;
+                switch (memberDescription)
+                {
+                    case PropertyDescription propertyDescription:
+                        AddPropertyDispatch(id, propertyDescription, typeBuilder, instanceFieldBuilder, dispatchFieldBuilder);
+                        break;
+                    case FieldDescription fieldDescription:
+                        AddFieldDispatch(id, fieldDescription, typeBuilder, instanceFieldBuilder, dispatchFieldBuilder);
+                        break;
+                    case MethodDescription methodDescription:
+                        AddMethodDispatch(id, methodDescription, typeBuilder, instanceFieldBuilder, dispatchFieldBuilder);
+                        break;
+                }
+            }
+
             try
             {
                 var constructedType = typeBuilder.CreateTypeInfo().AsType();
@@ -139,18 +157,159 @@ namespace Reflector.Core.Implementing
             ctorIlGenerator.Emit(OpCodes.Ret);
         }
 
-        private static void AddFieldAccessor(PropertyInfo targetProperty, TypeBuilder typeBuilder, FieldBuilder fieldInfo)
+        private static void AddFieldAccessor(PropertyInfo targetProperty, TypeBuilder typeBuilder, FieldInfo fieldInfo)
         {
             const MethodAttributes propertyMethodAttributes =
                 MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig | MethodAttributes.SpecialName;
 
             var propertyBuilder = typeBuilder.DefineProperty(targetProperty.Name, PropertyAttributes.None, typeof(Dispatcher), null);
-            var getter = typeBuilder.DefineMethod(targetProperty.GetMethod.Name, propertyMethodAttributes, targetProperty.PropertyType, new Type[0]);
+            var getter = typeBuilder.DefineMethod(targetProperty.GetMethod!.Name, propertyMethodAttributes, targetProperty.PropertyType, new Type[0]);
             var getterIlGenerator = getter.GetILGenerator();
             getterIlGenerator.Emit(OpCodes.Ldarg_0);
             getterIlGenerator.Emit(OpCodes.Ldfld, fieldInfo);
             getterIlGenerator.Emit(OpCodes.Ret);
             propertyBuilder.SetGetMethod(getter);
+        }
+
+        private static void AddPropertyDispatch(int id, PropertyDescription description, TypeBuilder typeBuilder, FieldInfo instanceField,
+                                                FieldInfo dispatcherField)
+        {
+            const MethodAttributes propertyMethodAttributes =
+                MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig | MethodAttributes.SpecialName;
+
+            var sourceProperty = description.SourceProperty;
+            var propertyBuilder = typeBuilder.DefineProperty(sourceProperty.Name, PropertyAttributes.None, sourceProperty.PropertyType, null);
+
+            if (sourceProperty.CanRead)
+            {
+                var getter = typeBuilder.DefineMethod(
+                    sourceProperty.GetMethod!.Name,
+                    propertyMethodAttributes,
+                    sourceProperty.PropertyType,
+                    new Type[0]
+                );
+                var generator = getter.GetILGenerator();
+                generator.Emit(OpCodes.Ldarg_0); // this
+                generator.Emit(OpCodes.Ldfld, dispatcherField); // this._dispatcher
+                generator.Emit(OpCodes.Ldarg_0); // this
+                generator.Emit(OpCodes.Ldfld, instanceField); // this._instance
+                generator.Emit(OpCodes.Ldc_I4, id);
+                generator.Emit(OpCodes.Callvirt, typeof(IDispatcher).GetMethod(nameof(IDispatcher.PropertyGet))!);
+                generator.Emit(OpCodes.Ret);
+                propertyBuilder.SetGetMethod(getter);
+            }
+
+            if (sourceProperty.CanWrite)
+            {
+                var setter = typeBuilder.DefineMethod(
+                    sourceProperty.SetMethod!.Name,
+                    propertyMethodAttributes,
+                    null,
+                    new[] { sourceProperty.PropertyType }
+                );
+                var generator = setter.GetILGenerator();
+                generator.Emit(OpCodes.Ldarg_0); // this
+                generator.Emit(OpCodes.Ldfld, dispatcherField); // this._dispatcher
+                generator.Emit(OpCodes.Ldarg_0); // this
+                generator.Emit(OpCodes.Ldfld, instanceField); // this._instance
+                generator.Emit(OpCodes.Ldc_I4, id);
+                generator.Emit(OpCodes.Ldarg_1); // value
+                generator.Emit(OpCodes.Callvirt, typeof(IDispatcher).GetMethod(nameof(IDispatcher.PropertySet))!);
+                generator.Emit(OpCodes.Ret);
+                propertyBuilder.SetSetMethod(setter);
+            }
+        }
+
+        private static void AddFieldDispatch(int id, FieldDescription description, TypeBuilder typeBuilder, FieldInfo instanceField, FieldInfo dispatcherField)
+        {
+            const MethodAttributes propertyMethodAttributes =
+                MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig | MethodAttributes.SpecialName;
+
+            var sourceProperty = description.SourceProperty;
+            var propertyBuilder = typeBuilder.DefineProperty(sourceProperty.Name, PropertyAttributes.None, sourceProperty.PropertyType, null);
+
+            if (sourceProperty.CanRead)
+            {
+                var getter = typeBuilder.DefineMethod(
+                    sourceProperty.GetMethod!.Name,
+                    propertyMethodAttributes,
+                    sourceProperty.PropertyType,
+                    new Type[0]
+                );
+                var generator = getter.GetILGenerator();
+                generator.Emit(OpCodes.Ldarg_0); // this
+                generator.Emit(OpCodes.Ldfld, dispatcherField); // this._dispatcher
+                generator.Emit(OpCodes.Ldarg_0); // this
+                generator.Emit(OpCodes.Ldfld, instanceField); // this._instance
+                generator.Emit(OpCodes.Ldc_I4, id);
+                generator.Emit(OpCodes.Callvirt, typeof(IDispatcher).GetMethod(nameof(IDispatcher.FieldGet))!);
+                generator.Emit(OpCodes.Ret);
+                propertyBuilder.SetGetMethod(getter);
+            }
+
+            if (sourceProperty.CanWrite)
+            {
+                var setter = typeBuilder.DefineMethod(
+                    sourceProperty.SetMethod!.Name,
+                    propertyMethodAttributes,
+                    null,
+                    new[] { sourceProperty.PropertyType }
+                );
+                var generator = setter.GetILGenerator();
+                generator.Emit(OpCodes.Ldarg_0); // this
+                generator.Emit(OpCodes.Ldfld, dispatcherField); // this._dispatcher
+                generator.Emit(OpCodes.Ldarg_0); // this
+                generator.Emit(OpCodes.Ldfld, instanceField); // this._instance
+                generator.Emit(OpCodes.Ldc_I4, id);
+                generator.Emit(OpCodes.Ldarg_1); // value
+                generator.Emit(OpCodes.Callvirt, typeof(IDispatcher).GetMethod(nameof(IDispatcher.FieldSet))!);
+                generator.Emit(OpCodes.Ret);
+                propertyBuilder.SetSetMethod(setter);
+            }
+        }
+
+        private static void AddMethodDispatch(int id, MethodDescription description, TypeBuilder typeBuilder, FieldInfo instanceField,
+                                              FieldInfo dispatcherField)
+        {
+            const MethodAttributes methodAttributes = MethodAttributes.Public | MethodAttributes.Virtual;
+
+            var source = description.SourceMethod;
+            var parameters = source.GetParameters().Select(x => x.ParameterType).ToArray();
+            var methodBuilder = typeBuilder.DefineMethod(
+                source.Name,
+                methodAttributes,
+                CallingConventions.HasThis | CallingConventions.Standard,
+                source.ReturnType,
+                parameters
+            );
+
+            var generator = methodBuilder.GetILGenerator();
+            generator.Emit(OpCodes.Ldarg_0); // this
+            generator.Emit(OpCodes.Ldfld, dispatcherField); // this._dispatcher
+            generator.Emit(OpCodes.Ldarg_0); // this
+            generator.Emit(OpCodes.Ldfld, instanceField); // this._instance
+            generator.Emit(OpCodes.Ldc_I4, id);
+
+            generator.Emit(OpCodes.Ldc_I4, parameters.Length);
+            generator.Emit(OpCodes.Newarr, typeof(object)); // var array = new object[param.length]
+
+            for (var i = 0; i < parameters.Length; i++)
+            {
+                generator.Emit(OpCodes.Dup); // array
+                generator.Emit(OpCodes.Ldc_I4, i);
+                generator.Emit(OpCodes.Ldarg, i + 1);
+                generator.Emit(OpCodes.Stelem_Ref); // array[i] = param[i]
+            }
+
+            var method = typeof(IDispatcher).GetMethod(nameof(IDispatcher.MethodCall));
+            generator.Emit(OpCodes.Callvirt, method);
+
+            if (methodBuilder.ReturnType == typeof(void))
+            {
+                generator.Emit(OpCodes.Pop);
+            }
+
+            generator.Emit(OpCodes.Ret);
         }
     }
 }
