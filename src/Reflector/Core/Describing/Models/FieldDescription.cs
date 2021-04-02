@@ -4,7 +4,7 @@ using Reflector.Contracts;
 
 namespace Reflector.Core.Describing.Models
 {
-    public delegate FieldInfo FieldInfoFactory(Type targetType);
+    public delegate FieldInfo? FieldInfoFactory(Type targetType);
 
     public class FieldDescription : MemberDescription
     {

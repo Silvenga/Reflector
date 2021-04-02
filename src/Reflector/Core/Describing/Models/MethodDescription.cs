@@ -4,7 +4,7 @@ using Reflector.Contracts;
 
 namespace Reflector.Core.Describing.Models
 {
-    public delegate MethodInfo MethodInfoFactory(Type targetType);
+    public delegate MethodInfo? MethodInfoFactory(Type targetType);
 
     public class MethodDescription : MemberDescription
     {

@@ -1,5 +1,5 @@
-﻿using System;
-using Reflector.Core.Describing.Models;
+﻿using Reflector.Core.Describing.Models;
+using Reflector.Exceptions;
 
 namespace Reflector.Core
 {
@@ -23,27 +23,77 @@ namespace Reflector.Core
 
         public object PropertyGet(object instance, int id)
         {
-            throw new NotImplementedException();
+            var member = (PropertyDescription) _description.Members[id];
+            var propertyInfo = member.PropertyInfoFactory.Invoke(instance.GetType());
+            if (propertyInfo == null)
+            {
+                throw new InvalidInvocationException($"Property '{member.MemberName}' could not be found.");
+            }
+
+            if (!propertyInfo.CanRead)
+            {
+                throw new InvalidInvocationException($"Property '{member.MemberName}' has no getter.");
+            }
+
+            return propertyInfo.GetValue(instance);
         }
 
         public void PropertySet(object instance, int id, object value)
         {
-            throw new NotImplementedException();
+            var member = (PropertyDescription) _description.Members[id];
+            var propertyInfo = member.PropertyInfoFactory.Invoke(instance.GetType());
+            if (propertyInfo == null)
+            {
+                throw new InvalidInvocationException($"Property '{member.MemberName}' could not be found.");
+            }
+
+            if (!propertyInfo.CanWrite)
+            {
+                throw new InvalidInvocationException($"Property '{member.MemberName}' has no setter.");
+            }
+
+            propertyInfo.SetValue(instance, value);
         }
 
         public object FieldGet(object instance, int id)
         {
-            throw new NotImplementedException();
+            var member = (FieldDescription) _description.Members[id];
+            var fieldInfo = member.FieldInfoFactory.Invoke(instance.GetType());
+            if (fieldInfo == null)
+            {
+                throw new InvalidInvocationException($"Field '{member.MemberName}' could not be found.");
+            }
+
+            return fieldInfo.GetValue(instance);
         }
 
         public void FieldSet(object instance, int id, object value)
         {
-            throw new NotImplementedException();
+            var member = (FieldDescription) _description.Members[id];
+            var fieldInfo = member.FieldInfoFactory.Invoke(instance.GetType());
+            if (fieldInfo == null)
+            {
+                throw new InvalidInvocationException($"Field '{member.MemberName}' could not be found.");
+            }
+
+            if (fieldInfo.IsInitOnly)
+            {
+                throw new InvalidInvocationException($"Field '{member.MemberName}' is read-only.");
+            }
+
+            fieldInfo.SetValue(instance, value);
         }
 
         public object MethodCall(object instance, int id, object[] arguments)
         {
-            throw new NotImplementedException();
+            var member = (MethodDescription) _description.Members[id];
+            var methodInfo = member.MethodInfoFactory.Invoke(instance.GetType());
+            if (methodInfo == null)
+            {
+                throw new InvalidInvocationException($"Method '{member.MemberName}' could not be found.");
+            }
+
+            return methodInfo.Invoke(instance, arguments);
         }
     }
 }

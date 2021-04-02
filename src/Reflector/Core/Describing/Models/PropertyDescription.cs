@@ -4,7 +4,7 @@ using Reflector.Contracts;
 
 namespace Reflector.Core.Describing.Models
 {
-    public delegate PropertyInfo PropertyInfoFactory(Type targetType);
+    public delegate PropertyInfo? PropertyInfoFactory(Type targetType);
 
     public class PropertyDescription : MemberDescription
     {
