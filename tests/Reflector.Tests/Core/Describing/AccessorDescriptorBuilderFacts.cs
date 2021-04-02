@@ -2,7 +2,6 @@
 using Reflector.Contracts;
 using Reflector.Core.Describing;
 using Reflector.Core.Describing.Models;
-using Reflector.Tests.Fixtures;
 using Xunit;
 
 namespace Reflector.Tests.Core.Describing
@@ -12,7 +11,7 @@ namespace Reflector.Tests.Core.Describing
         [Fact]
         public void When_describing_fields_then_field_description_should_be_produced()
         {
-            var builder  = new DescriptionBuilder();
+            var builder = new DescriptionBuilder();
 
             // Act
             var description = builder.Describe<IExampleAccessorFixture>();
@@ -25,7 +24,7 @@ namespace Reflector.Tests.Core.Describing
         [Fact]
         public void When_describing_properties_then_property_description_should_be_produced()
         {
-            var builder  = new DescriptionBuilder();
+            var builder = new DescriptionBuilder();
 
             // Act
             var description = builder.Describe<IExampleAccessorFixture>();
@@ -38,7 +37,7 @@ namespace Reflector.Tests.Core.Describing
         [Fact]
         public void When_describing_void_methods_then_method_description_should_be_produced()
         {
-            var builder  = new DescriptionBuilder();
+            var builder = new DescriptionBuilder();
 
             // Act
             var description = builder.Describe<IExampleAccessorFixture>();
@@ -51,7 +50,7 @@ namespace Reflector.Tests.Core.Describing
         [Fact]
         public void When_describing_methods_with_returns_then_method_description_should_be_produced()
         {
-            var builder  = new DescriptionBuilder();
+            var builder = new DescriptionBuilder();
 
             // Act
             var description = builder.Describe<IExampleAccessorFixture>();
@@ -64,7 +63,7 @@ namespace Reflector.Tests.Core.Describing
         [Fact]
         public void When_describing_methods_with_arguments_then_method_description_should_be_produced()
         {
-            var builder  = new DescriptionBuilder();
+            var builder = new DescriptionBuilder();
 
             // Act
             var description = builder.Describe<IExampleAccessorFixture>();
@@ -77,7 +76,7 @@ namespace Reflector.Tests.Core.Describing
         [Fact]
         public void When_accessor_then_instance_property_description_should_be_produced()
         {
-            var builder  = new DescriptionBuilder();
+            var builder = new DescriptionBuilder();
 
             // Act
             var description = builder.Describe<IExampleAccessorFixture>();
@@ -86,11 +85,10 @@ namespace Reflector.Tests.Core.Describing
             description.InstanceProperty.Should().NotBeNull();
         }
 
-
         [Fact]
         public void When_accessor_then_dispatcher_property_description_should_be_produced()
         {
-            var builder  = new DescriptionBuilder();
+            var builder = new DescriptionBuilder();
 
             // Act
             var description = builder.Describe<IExampleAccessorFixture>();
@@ -99,7 +97,6 @@ namespace Reflector.Tests.Core.Describing
             description.DispatcherProperty.Should().NotBeNull();
         }
 
-        [ExpectType("Reflector.Tests.Fixtures." + nameof(Example))]
         private interface IExampleAccessorFixture : ITypedReflectAccessor
         {
             [FieldBinding("Field")]
