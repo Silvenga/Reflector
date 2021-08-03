@@ -14,8 +14,11 @@ namespace Reflector.Core.Describing.Models
 
         public FieldInfoFactory FieldInfoFactory { get; }
 
-        public FieldDescription(int id, string memberName, PropertyInfo sourceProperty, FieldBindingAttribute bindingAttribute,
-                                FieldInfoFactory fieldInfoFactory) : base(id, memberName)
+        public FieldDescription(int id, string memberName,
+                                PropertyInfo sourceProperty,
+                                FieldBindingAttribute bindingAttribute,
+                                FieldInfoFactory fieldInfoFactory)
+            : base(id, memberName)
         {
             SourceProperty = sourceProperty;
             BindingAttribute = bindingAttribute;

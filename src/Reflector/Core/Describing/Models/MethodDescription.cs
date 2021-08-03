@@ -10,11 +10,16 @@ namespace Reflector.Core.Describing.Models
     {
         public MethodBindingAttribute BindingAttribute { get; }
 
-        public MethodInfo SourceMethod { get; set; }
+        public MethodInfo SourceMethod { get; }
 
         public MethodInfoFactory MethodInfoFactory { get; }
 
-        public MethodDescription(int id, string memberName, MethodBindingAttribute bindingAttribute, MethodInfo sourceMethod, MethodInfoFactory methodInfoFactory) : base(id, memberName)
+        public MethodDescription(int id,
+                                 string memberName,
+                                 MethodBindingAttribute bindingAttribute,
+                                 MethodInfo sourceMethod,
+                                 MethodInfoFactory methodInfoFactory)
+            : base(id, memberName)
         {
             BindingAttribute = bindingAttribute;
             SourceMethod = sourceMethod;

@@ -14,8 +14,12 @@ namespace Reflector.Core.Describing.Models
 
         public PropertyInfoFactory PropertyInfoFactory { get; }
 
-        public PropertyDescription(int id, string memberName, PropertyInfo sourceProperty, PropertyBindingAttribute bindingAttribute,
-                                   PropertyInfoFactory propertyInfoFactory) : base(id, memberName)
+        public PropertyDescription(int id,
+                                   string memberName,
+                                   PropertyInfo sourceProperty,
+                                   PropertyBindingAttribute bindingAttribute,
+                                   PropertyInfoFactory propertyInfoFactory)
+            : base(id, memberName)
         {
             SourceProperty = sourceProperty;
             BindingAttribute = bindingAttribute;

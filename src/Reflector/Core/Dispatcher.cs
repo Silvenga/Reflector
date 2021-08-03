@@ -5,6 +5,8 @@ namespace Reflector.Core
 {
     public interface IDispatcher
     {
+        AccessorDescription Description { get; }
+
         object PropertyGet(object instance, int id);
         void PropertySet(object instance, int id, object value);
         object FieldGet(object instance, int id);
@@ -14,16 +16,16 @@ namespace Reflector.Core
 
     public class Dispatcher : IDispatcher
     {
-        private readonly AccessorDescription _description;
+        public AccessorDescription Description { get; }
 
         public Dispatcher(AccessorDescription description)
         {
-            _description = description;
+            Description = description;
         }
 
         public object PropertyGet(object instance, int id)
         {
-            var member = (PropertyDescription) _description.Members[id];
+            var member = (PropertyDescription) Description.Members[id];
             var propertyInfo = member.PropertyInfoFactory.Invoke(instance.GetType());
             if (propertyInfo == null)
             {
@@ -40,7 +42,7 @@ namespace Reflector.Core
 
         public void PropertySet(object instance, int id, object value)
         {
-            var member = (PropertyDescription) _description.Members[id];
+            var member = (PropertyDescription) Description.Members[id];
             var propertyInfo = member.PropertyInfoFactory.Invoke(instance.GetType());
             if (propertyInfo == null)
             {
@@ -57,7 +59,7 @@ namespace Reflector.Core
 
         public object FieldGet(object instance, int id)
         {
-            var member = (FieldDescription) _description.Members[id];
+            var member = (FieldDescription) Description.Members[id];
             var fieldInfo = member.FieldInfoFactory.Invoke(instance.GetType());
             if (fieldInfo == null)
             {
@@ -69,7 +71,7 @@ namespace Reflector.Core
 
         public void FieldSet(object instance, int id, object value)
         {
-            var member = (FieldDescription) _description.Members[id];
+            var member = (FieldDescription) Description.Members[id];
             var fieldInfo = member.FieldInfoFactory.Invoke(instance.GetType());
             if (fieldInfo == null)
             {
@@ -86,7 +88,7 @@ namespace Reflector.Core
 
         public object MethodCall(object instance, int id, object[] arguments)
         {
-            var member = (MethodDescription) _description.Members[id];
+            var member = (MethodDescription) Description.Members[id];
             var methodInfo = member.MethodInfoFactory.Invoke(instance.GetType());
             if (methodInfo == null)
             {

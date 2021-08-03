@@ -163,7 +163,7 @@ namespace Reflector.Core.Implementing
                 MethodAttributes.Public | MethodAttributes.Virtual | MethodAttributes.HideBySig | MethodAttributes.SpecialName;
 
             var propertyBuilder = typeBuilder.DefineProperty(targetProperty.Name, PropertyAttributes.None, typeof(Dispatcher), null);
-            var getter = typeBuilder.DefineMethod(targetProperty.GetMethod!.Name, propertyMethodAttributes, targetProperty.PropertyType, new Type[0]);
+            var getter = typeBuilder.DefineMethod(targetProperty.GetMethod!.Name, propertyMethodAttributes, targetProperty.PropertyType, Type.EmptyTypes);
             var getterIlGenerator = getter.GetILGenerator();
             getterIlGenerator.Emit(OpCodes.Ldarg_0);
             getterIlGenerator.Emit(OpCodes.Ldfld, fieldInfo);
@@ -234,7 +234,7 @@ namespace Reflector.Core.Implementing
                     sourceProperty.GetMethod!.Name,
                     propertyMethodAttributes,
                     sourceProperty.PropertyType,
-                    new Type[0]
+                    Type.EmptyTypes
                 );
                 var generator = getter.GetILGenerator();
                 generator.Emit(OpCodes.Ldarg_0); // this

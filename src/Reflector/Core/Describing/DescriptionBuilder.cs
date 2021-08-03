@@ -12,6 +12,7 @@ namespace Reflector.Core.Describing
         // TODO:
         // - Ignore IsSpecialName?
         // - Handle inheritance.
+        // - Overloads.
 
         private int _lastId;
 
@@ -22,11 +23,6 @@ namespace Reflector.Core.Describing
                                      ?? throw new ArgumentException("Dispatcher property is missing on ITypedReflectAccessor");
             var instanceProperty = typeof(ITypedReflectAccessor).GetProperty(nameof(ITypedReflectAccessor.Instance))
                                    ?? throw new ArgumentException("Instance property is missing on ITypedReflectAccessor");
-            var accessorDescription = new AccessorDescription(
-                accessorType,
-                dispatcherProperty,
-                instanceProperty
-            );
 
             var members = new Dictionary<int, MemberDescription>();
 
@@ -48,9 +44,12 @@ namespace Reflector.Core.Describing
                 members.Add(method.Id, method);
             }
 
-            accessorDescription.Members = members;
-
-            return accessorDescription;
+            return new AccessorDescription(
+                accessorType,
+                dispatcherProperty,
+                instanceProperty,
+                members
+            );
         }
 
         private IEnumerable<FieldDescription> BuildFields(Type accessorType)

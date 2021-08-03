@@ -6,21 +6,25 @@ namespace Reflector.Core.Describing.Models
 {
     public class AccessorDescription
     {
-        public Type AccessorType { get; set; }
+        public Type AccessorType { get; }
 
-        public PropertyInfo DispatcherProperty { get; set; }
+        public PropertyInfo DispatcherProperty { get; }
 
-        public PropertyInfo InstanceProperty { get; set; }
+        public PropertyInfo InstanceProperty { get; }
 
-        public IReadOnlyDictionary<int, MemberDescription> Members { get; set; } = new Dictionary<int, MemberDescription>();
+        public IReadOnlyDictionary<int, MemberDescription> Members { get; }
 
         public IReadOnlyList<AccessorExpectation> Expectations { get; set; } = new List<AccessorExpectation>();
 
-        public AccessorDescription(Type accessorType, PropertyInfo dispatcherProperty, PropertyInfo instanceProperty)
+        public AccessorDescription(Type accessorType,
+                                   PropertyInfo dispatcherProperty, 
+                                   PropertyInfo instanceProperty,
+                                   IReadOnlyDictionary<int, MemberDescription> members)
         {
             AccessorType = accessorType;
             DispatcherProperty = dispatcherProperty;
             InstanceProperty = instanceProperty;
+            Members = members;
         }
     }
 }
